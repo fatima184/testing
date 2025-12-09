@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astra Labs | Premier Research Standards</title>
+    
+    <!-- Fonts: Poppins (Headings) & Inter (Body) for technical precision -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        onyx: {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                            950: '#030712', // Deepest Black
+                        },
+                        chrome: {
+                            100: '#ffffff',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                        }
+                    },
+                    backgroundImage: {
+                        'chrome-gradient': 'linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #e2e8f0 100%)',
+                        'chrome-text': 'linear-gradient(to right, #f8fafc, #94a3b8, #f8fafc)',
+                        'dark-shine': 'linear-gradient(45deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.0) 100%)',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(148, 163, 184, 0.15)',
+                        'chrome': '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- App Logic -->
+    <script>
+        function shopData() {
+            return {
+                cartOpen: false,
+                cart: [],
+                mobileMenuOpen: false,
+                products: [
+                    { id: 1, name: 'BPC-157 Prime', sku: 'AST-157', category: 'Regenerative', spec: '5mg • 99.9% Purity', price: '$48.99', oldPrice: '$55.99', sale: true, image: 'flask-conical' },
+                    { id: 2, name: 'TB-500 Chrome', sku: 'AST-500', category: 'Regenerative', spec: '2mg • Research Grade', price: '$39.99', oldPrice: null, sale: false, image: 'beaker' },
+                    { id: 3, name: 'Ipamorelin V2', sku: 'AST-IPA', category: 'Metabolic', spec: '2mg • Lyophilized', price: '$27.99', oldPrice: '$34.99', sale: true, image: 'test-tube-2' },
+                    { id: 4, name: 'CJC-1295 No DAC', sku: 'AST-129', category: 'Metabolic', spec: '2mg • High Purity', price: '$30.99', oldPrice: null, sale: false, image: 'microscope' },
+                    { id: 5, name: 'GHK-Cu Copper', sku: 'AST-GHK', category: 'Cosmetic', spec: '50mg • Copper Peptide', price: '$45.00', oldPrice: null, sale: false, image: 'pipette' },
+                    { id: 6, name: 'BAC Water', sku: 'AST-BAC', category: 'Solvents', spec: '30ml • USP Grade', price: '$12.50', oldPrice: null, sale: false, image: 'droplets' },
+                ],
+                addToCart(product) {
+                    this.cart.push(product);
+                    this.cartOpen = true;
+                },
+                removeFromCart(index) {
+                    this.cart.splice(index, 1);
+                },
+                get cartTotal() {
+                    return this.cart.length;
+                },
+                get cartSubtotal() {
+                    let total = 0;
+                    this.cart.forEach(item => {
+                        let price = parseFloat(item.price.replace('$', ''));
+                        total += price;
+                    });
+                    return '$' + total.toFixed(2);
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        /* Custom Scrollbar for Dark Theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; 
+        }
+
+        /* Subtle Grid Background */
+        .grid-bg {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-onyx-950 text-onyx-300 antialiased selection:bg-chrome-400 selection:text-onyx-950" x-data="shopData()">
+
+    <!-- Announcement Bar -->
+    <div class="bg-black text-xs py-2 border-b border-onyx-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center md:justify-between items-center text-onyx-400 font-mono uppercase tracking-widest">
+            <span class="hidden md:inline">Research Purposes Only // Not For Human Consumption</span>
+            <span class="flex items-center text-chrome-200">
+                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
+                Free Priority Shipping > $150
+            </span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-onyx-950/80 backdrop-blur-xl border-b border-onyx-800" x-data="{ scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 20)">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center group cursor-pointer">
+                    <div class="w-10 h-10 border border-onyx-700 bg-onyx-900 rounded flex items-center justify-center text-chrome-200 shadow-lg group-hover:border-chrome-400 transition-colors duration-300">
+                        <i data-lucide="flask-conical" class="w-5 h-5"></i>
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-heading font-bold text-xl text-white tracking-tight block leading-none">ASTRA</span>
+                        <span class="text-[10px] font-mono text-chrome-400 uppercase tracking-[0.3em]">Labs</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-10 items-center">
+                    <a href="#" class="text-sm font-medium text-onyx-400 hover:text-white transition-colors">Catalog</a>
+                    <a href="#" class="text-sm font-medium text-onyx-400 hover:text-white transition-colors">Proteomics</a>
+                    <a href="#" class="text-sm font-medium text-onyx-400 hover:text-white transition-colors">Quality Control</a>
+                    <a href="#" class="text-sm font-medium text-onyx-400 hover:text-white transition-colors">Wholesale</a>
+                </div>
+
+                <!-- Icons -->
+                <div class="flex items-center space-x-6">
+                    <button class="text-onyx-400 hover:text-white transition">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+                    <button class="text-onyx-400 hover:text-white transition hidden sm:block">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </button>
+                    <button @click="cartOpen = true" class="relative group">
+                        <div class="text-onyx-200 hover:text-white transition">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        </div>
+                        <span x-show="cartTotal > 0" class="absolute -top-1.5 -right-1.5 bg-chrome-200 text-onyx-950 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center" x-text="cartTotal"></span>
+                    </button>
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-onyx-400">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenuOpen" class="md:hidden bg-onyx-900 border-t border-onyx-800 p-4" x-cloak>
+            <div class="flex flex-col space-y-4">
+                <a href="#" class="text-onyx-200 font-medium">Catalog</a>
+                <a href="#" class="text-onyx-200 font-medium">Quality Control</a>
+                <a href="#" class="text-onyx-200 font-medium">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-32 overflow-hidden bg-onyx-950 grid-bg">
+        <!-- Abstract Glows -->
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-chrome-400/5 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-onyx-800/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            
+            <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-onyx-900 border border-onyx-700 text-chrome-300 text-xs font-mono mb-8 backdrop-blur-md">
+                <span class="w-1.5 h-1.5 bg-chrome-200 rounded-full mr-3 animate-pulse"></span>
+                SYSTEM STATUS: OPERATIONAL // BATCH 2025-A READY
+            </div>
+            
+            <h1 class="font-heading font-bold text-5xl md:text-7xl lg:text-8xl text-white mb-6 leading-tight tracking-tight">
+                <span class="bg-clip-text text-transparent bg-chrome-text">Research Grade</span><br>
+                Bio-Identical Peptides
+            </h1>
+            
+            <p class="text-lg md:text-xl text-onyx-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+                The gold standard in peptide synthesis. Astra Labs provides >99.9% purity verified by third-party HPLC and Mass Spectrometry. 
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <!-- Chrome Button -->
+                <button class="group relative px-8 py-4 bg-chrome-gradient text-onyx-950 text-sm font-bold uppercase tracking-wider rounded transition-transform hover:-translate-y-1 hover:shadow-glow">
+                    <span class="flex items-center gap-2">
+                        Initialize Order
+                        <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
+                    </span>
+                </button>
+                <!-- Ghost Button -->
+                <button class="px-8 py-4 bg-transparent border border-onyx-700 text-white text-sm font-medium uppercase tracking-wider rounded hover:bg-onyx-800 hover:border-onyx-600 transition-colors">
+                    View Certificates
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Strip -->
+    <section class="border-y border-onyx-800 bg-onyx-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-onyx-800 border-x border-onyx-800">
+                <div class="p-8 text-center group cursor-pointer hover:bg-onyx-800 transition-colors">
+                    <i data-lucide="activity" class="w-8 h-8 text-chrome-400 mx-auto mb-4 group-hover:text-white transition-colors"></i>
+                    <h3 class="text-white font-bold text-sm uppercase tracking-wide">Peptides</h3>
+                </div>
+                <div class="p-8 text-center group cursor-pointer hover:bg-onyx-800 transition-colors">
+                    <i data-lucide="dna" class="w-8 h-8 text-chrome-400 mx-auto mb-4 group-hover:text-white transition-colors"></i>
+                    <h3 class="text-white font-bold text-sm uppercase tracking-wide">Proteins</h3>
+                </div>
+                <div class="p-8 text-center group cursor-pointer hover:bg-onyx-800 transition-colors">
+                    <i data-lucide="flask-round" class="w-8 h-8 text-chrome-400 mx-auto mb-4 group-hover:text-white transition-colors"></i>
+                    <h3 class="text-white font-bold text-sm uppercase tracking-wide">Solvents</h3>
+                </div>
+                <div class="p-8 text-center group cursor-pointer hover:bg-onyx-800 transition-colors">
+                    <i data-lucide="microscope" class="w-8 h-8 text-chrome-400 mx-auto mb-4 group-hover:text-white transition-colors"></i>
+                    <h3 class="text-white font-bold text-sm uppercase tracking-wide">Lab Gear</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Highlights (Dark Card Style) -->
+    <section class="py-24 bg-onyx-950">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-end mb-16">
+                <div>
+                    <h2 class="font-heading font-bold text-3xl md:text-4xl text-white mb-2">Selected Compounds</h2>
+                    <p class="text-onyx-500 font-mono text-sm">CATALOG ID: 2025-Q1 // PUBLIC ACCESS</p>
+                </div>
+                <a href="#" class="hidden sm:flex items-center text-chrome-300 hover:text-white text-sm font-medium transition-colors">
+                    View Full Database <i data-lucide="arrow-right" class="ml-2 w-4 h-4"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <template x-for="product in products" :key="product.id">
+                    <div class="bg-onyx-900 border border-onyx-800 rounded-none p-0 group hover:border-chrome-500/50 transition-all duration-300 relative">
+                        <!-- Sale Badge -->
+                        <span x-show="product.sale" class="absolute top-4 left-4 bg-chrome-200 text-onyx-950 text-[10px] font-bold uppercase px-2 py-1 z-10">Restocked</span>
+
+                        <!-- Image Area -->
+                        <div class="h-64 bg-onyx-800/50 flex items-center justify-center relative overflow-hidden">
+                            <div class="absolute inset-0 bg-dark-shine opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <i :data-lucide="product.image" class="w-20 h-20 text-onyx-600 group-hover:text-chrome-200 group-hover:scale-110 transition-all duration-500"></i>
+                            
+                            <!-- Quick Add Button -->
+                            <button @click="addToCart(product)" class="absolute bottom-4 right-4 bg-white text-black p-3 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-chrome-200">
+                                <i data-lucide="plus" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="text-xs text-chrome-400 font-mono uppercase" x-text="product.sku"></div>
+                                <div class="text-xs text-onyx-500 uppercase" x-text="product.category"></div>
+                            </div>
+                            <h3 class="font-heading font-bold text-lg text-white mb-1 group-hover:text-chrome-300 transition-colors" x-text="product.name"></h3>
+                            <p class="text-sm text-onyx-400 mb-6" x-text="product.spec"></p>
+                            
+                            <div class="flex items-center gap-3 font-mono border-t border-onyx-800 pt-4">
+                                <span class="text-lg text-white font-medium" x-text="product.price"></span>
+                                <span class="text-sm text-onyx-600 line-through decoration-onyx-600" x-show="product.oldPrice" x-text="product.oldPrice"></span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            
+            <div class="mt-12 text-center sm:hidden">
+                 <a href="#" class="text-chrome-300 text-sm font-medium border-b border-chrome-300 pb-1">View Full Database</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chrome CTA Section -->
+    <section class="py-24 bg-onyx-900 border-y border-onyx-800 relative">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="font-heading font-bold text-3xl md:text-5xl text-white mb-8">
+                Precision You Can <span class="text-chrome-400 font-serif italic">Measure.</span>
+            </h2>
+            <p class="text-onyx-400 mb-10 max-w-xl mx-auto">
+                Join over 1,200 laboratories relying on Astra Labs for consistent peptides. Mass spec reports included with every shipment.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left mb-12 border-t border-onyx-800 pt-12">
+                <div>
+                    <h4 class="text-white font-bold mb-2">HPLC Verified</h4>
+                    <p class="text-sm text-onyx-500">Every batch is tested for >99% purity.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-2">USA Synthesis</h4>
+                    <p class="text-sm text-onyx-500">Domestic production and shipping.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-2">Secure Data</h4>
+                    <p class="text-sm text-onyx-500">256-bit encrypted transactions.</p>
+                </div>
+            </div>
+            <button class="w-full md:w-auto px-12 py-4 bg-white text-black font-bold uppercase tracking-wider hover:bg-chrome-200 transition-colors">
+                Apply for Wholesale Account
+            </button>
+        </div>
+    </section>
+
+    <!-- Dark Footer -->
+    <footer class="bg-black pt-20 pb-10 border-t border-onyx-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                <div class="col-span-1 md:col-span-1">
+                    <span class="font-heading font-bold text-2xl text-white tracking-tighter mb-6 block">ASTRA</span>
+                    <p class="text-onyx-500 text-sm mb-6">
+                        Advanced chemical research solutions for the modern laboratory environment.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-onyx-500 hover:text-white transition"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-onyx-500 hover:text-white transition"><i data-lucide="github" class="w-5 h-5"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold mb-6">Catalog</h4>
+                    <ul class="space-y-3 text-sm text-onyx-500">
+                        <li><a href="#" class="hover:text-chrome-300 transition">Peptides</a></li>
+                        <li><a href="#" class="hover:text-chrome-300 transition">Proteins</a></li>
+                        <li><a href="#" class="hover:text-chrome-300 transition">Amino Acids</a></li>
+                        <li><a href="#" class="hover:text-chrome-300 transition">New Arrivals</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-6">Support</h4>
+                    <ul class="space-y-3 text-sm text-onyx-500">
+                        <li><a href="#" class="hover:text-chrome-300 transition">CoA Lookup</a></li>
+                        <li><a href="#" class="hover:text-chrome-300 transition">Track Order</a></li>
+                        <li><a href="#" class="hover:text-chrome-300 transition">Shipping Policy</a></li>
+                        <li><a href="#" class="hover:text-chrome-300 transition">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-6">Newsletter</h4>
+                    <div class="flex flex-col gap-3">
+                        <input type="email" placeholder="Enter lab email" class="bg-onyx-900 border border-onyx-800 text-white px-4 py-3 text-sm focus:outline-none focus:border-chrome-500 placeholder-onyx-600">
+                        <button class="bg-onyx-800 text-white px-4 py-3 text-sm font-bold uppercase hover:bg-onyx-700 transition">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-onyx-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-onyx-600">
+                <p>&copy; 2025 Astra Research Labs. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-onyx-400">Privacy</a>
+                    <a href="#" class="hover:text-onyx-400">Terms</a>
+                    <a href="#" class="hover:text-onyx-400">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Slide-over (Dark Mode) -->
+    <div x-show="cartOpen" class="fixed inset-0 z-[60] overflow-hidden" role="dialog" aria-modal="true" x-cloak>
+        <div class="absolute inset-0 overflow-hidden">
+            <div x-show="cartOpen" x-transition:enter="ease-in-out duration-500" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-500" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" @click="cartOpen = false"></div>
+
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                <div x-show="cartOpen" x-transition:enter="transform transition ease-in-out duration-500" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transform transition ease-in-out duration-500" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full" class="pointer-events-auto w-screen max-w-md">
+                    
+                    <div class="flex h-full flex-col overflow-y-scroll bg-onyx-950 border-l border-onyx-800 shadow-2xl">
+                        <div class="flex-1 overflow-y-auto py-6 px-4 sm:px-6">
+                            <div class="flex items-start justify-between">
+                                <h2 class="text-lg font-heading font-bold text-white">Requisition List</h2>
+                                <button @click="cartOpen = false" type="button" class="-m-2 p-2 text-onyx-500 hover:text-white">
+                                    <i data-lucide="x" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+
+                            <div class="mt-8">
+                                <div class="flow-root">
+                                    <ul role="list" class="-my-6 divide-y divide-onyx-800">
+                                        <li x-show="cart.length === 0" class="py-12 text-center text-onyx-500">
+                                            <i data-lucide="test-tube" class="w-12 h-12 mx-auto mb-3 opacity-20"></i>
+                                            <p>No items in requisition list.</p>
+                                        </li>
+                                        <template x-for="(item, index) in cart" :key="index">
+                                            <li class="flex py-6">
+                                                <div class="h-20 w-20 flex-shrink-0 overflow-hidden border border-onyx-800 bg-onyx-900 flex items-center justify-center">
+                                                    <i :data-lucide="item.image" class="w-8 h-8 text-onyx-600"></i>
+                                                </div>
+                                                <div class="ml-4 flex flex-1 flex-col">
+                                                    <div>
+                                                        <div class="flex justify-between text-base font-medium text-white">
+                                                            <h3 x-text="item.name"></h3>
+                                                            <p class="ml-4 font-mono" x-text="item.price"></p>
+                                                        </div>
+                                                        <p class="mt-1 text-sm text-onyx-500" x-text="item.spec"></p>
+                                                    </div>
+                                                    <div class="flex flex-1 items-end justify-between text-sm">
+                                                        <p class="text-onyx-500">Qty 1</p>
+                                                        <button @click="removeFromCart(index)" type="button" class="font-medium text-red-500 hover:text-red-400">Remove</button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-onyx-800 py-6 px-4 sm:px-6 bg-onyx-900" x-show="cart.length > 0">
+                            <div class="flex justify-between text-base font-medium text-white mb-4">
+                                <p>Subtotal</p>
+                                <p class="font-mono" x-text="cartSubtotal"></p>
+                            </div>
+                            <button class="w-full flex items-center justify-center rounded bg-white text-black px-6 py-4 text-base font-bold uppercase hover:bg-chrome-200 transition">Proceed to Checkout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        document.addEventListener('alpine:initialized', () => {
+             setInterval(() => lucide.createIcons(), 1000); 
+        });
+    </script>
+</body>
+</html>
